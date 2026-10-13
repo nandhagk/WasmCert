@@ -215,11 +215,15 @@ Proof.
   intros hs s ccs [vs es] d.
   get_cc ccs.
   (* Return needs an additional frame to execute; otherwise it returns in a type error. *)
-  destruct ccs' as [| ccs' cc0] using last_ind; first by resolve_invalid_typing.
-  clear IHccs'.
+  destruct ccs' as [| cc1 ccs']; first by resolve_invalid_typing.
   destruct fc as [lvs lk lf les].
   destruct (lk <= length vs) eqn:Hvslen.
-  - apply <<hs, (s, rcons ccs' cc0, (take lk vs ++ lvs, les), None), N.sub d 1>> => //=; last by destruct ccs'.
+  - apply <<hs, (s, cc1 :: ccs', (take lk vs ++ lvs, les), None), N.sub d 1>> => //=.
+    (* The executable result keeps the cons-list callers. Only its reduction
+       certificate uses the outermost-frame view supplied by last_ind. *)
+    remember (cc1 :: ccs') as callers eqn:Hcallers.
+    destruct callers as [| ccs0 cc0] using last_ind; first by discriminate Hcallers.
+    clear IHcallers Hcallers.
     unfold reduce_ctx => /=.
     rewrite rev_cons rev_rcons rcons_cons.
     destruct cc0 as [[fvs0 fk0 ff0 fes0] lcs0].
@@ -237,7 +241,7 @@ Proof.
     }
   (* Not enough values *)
   - resolve_invalid_typing.
-    assert (length extr1 = lk) as <-; first by injection Hretcons; destruct ccs'.
+    assert (length extr1 = lk) as <-; first by injection Hretcons.
     by discriminate_size.
 Defined.
 
@@ -354,8 +358,7 @@ Definition run_ctx_return_invoke hs s ccs vs es a d:
 Proof.
   get_cc ccs.
   (* Return_invoke always comes with another frame, otherwise the return field of the typing context could not be non-empty to match the typing rule of AI_return_invoke. *)
-  destruct ccs' as [| ccs' cc0] using last_ind; first by resolve_invalid_typing.
-  clear IHccs'.
+  destruct ccs' as [| cc1 ccs']; first by resolve_invalid_typing.
   destruct fc as [lvs lk lf les].
   (* Check function type *)
   destruct (lookup_N s.(s_funcs) a) as [cl|] eqn:?.
@@ -364,7 +367,11 @@ Proof.
     destruct (length ts2 == lk) eqn:Hfarity; move/eqP in Hfarity.
     (* Check for number of values against the consumed types of the function. Note that this is not a returning from the frame, therefore the arity is not checked against vs (unlike when returning) *)
     + destruct (length ts1 <= length vs) eqn:Hvslen.
-      * apply <<hs, (s, rcons ccs' cc0, (take (length ts1) vs ++ lvs, les), Some (AI_invoke a)), N.sub d 1>> => //=; last by destruct ccs'.
+      * apply <<hs, (s, cc1 :: ccs', (take (length ts1) vs ++ lvs, les), Some (AI_invoke a)), N.sub d 1>> => //=.
+        (* As for return, the right-cons view is needed only in the proof. *)
+        remember (cc1 :: ccs') as callers eqn:Hcallers.
+        destruct callers as [| ccs0 cc0] using last_ind; first by discriminate Hcallers.
+        clear IHcallers Hcallers.
         unfold reduce_ctx => /=.
         rewrite rev_cons rev_rcons rcons_cons.
         destruct cc0 as [[fvs0 fk0 ff0 fes0] lcs0].
@@ -394,7 +401,7 @@ Proof.
       rewrite Heqo Hcltype in Hconjl0.
       injection Hconjl0 as <- <-.
       apply Hfarity.
-      injection Hretcons => //; by destruct ccs'.
+      by injection Hretcons.
   (* None *)
   - resolve_invalid_typing.
     unfold ext_func_typing in Hconjl0.
