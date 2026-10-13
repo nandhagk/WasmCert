@@ -1449,7 +1449,7 @@ Definition opp : T -> T := Binary.Bopp _ _ wasm_opp_nan.
   The sign is not specified if given 0 as a mantissa. **)
 Definition normalise (m e : Z) : T :=
   Binary.binary_normalize _ _ prec_gt_0 Hmax
-    BinarySingleNaN.mode_NE m e ltac:(abstract exact false).
+    BinarySingleNaN.mode_NE m e false.
 
 (** As Flocq is unfortunately undocumented, let us introduce a unit test here, to check
   that indeed we have the correct understanding of definitions.
