@@ -3,6 +3,8 @@
 
 From Stdlib Require Import Lia Wf_nat ZArith.
 From mathcomp Require Import ssreflect ssrnat ssrbool seq eqtype.
+(* Preserve the goal ordering expected by this development's proof scripts. *)
+Global Set SsrOldRewriteGoalsOrder.
 From compcert Require Integers.
 From HB Require Import structures.
 
