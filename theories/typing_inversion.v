@@ -631,6 +631,7 @@ Proof.
     exists ts3_comp.
     by repeat split => //=; apply ety_a' => //=.
   - (* subtyping *)
+    specialize (IHHType es1 es2 (Logic.eq_refl _) t1s t2s (Logic.eq_refl _)).
     extract_premise.
     unfold instr_subtyping in *; extract_premise; subst.
     exists (extr0 ++ extr); split; eapply ety_subtyping; eauto; unfold instr_subtyping.
