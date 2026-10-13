@@ -489,7 +489,9 @@ Proof.
       by apply reduce_not_nil in Hred.
     }
     destruct es => //=; first by apply reduce_not_nil in Hred.
-    by destruct es, l => //=.
+    destruct es, l => //=.
+    apply: (IHHred v).
+    by simpl in H.
   }
 Qed.
 
