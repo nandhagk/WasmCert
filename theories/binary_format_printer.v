@@ -100,9 +100,9 @@ Definition binary_of_value_types bt : list byte :=
 Definition binary_of_result_type rt : list byte :=
   binary_of_vec (fun v => binary_of_value_type v :: nil) rt.
 
-(** An opaque definition for cases that can’t happen because of the well-formed properties. **)
+(** A fallback definition for cases that can’t happen because of the well-formed properties. **)
 Definition dummy : list byte.
-Proof. exact (x00 :: x00 :: x00 :: nil). Qed.
+Proof. exact (x00 :: x00 :: x00 :: nil). Defined.
 
 (* placeholder for vector values, not implemented *)
 Definition binary_of_valvec (v: value_vec) :=
