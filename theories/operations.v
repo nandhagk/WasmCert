@@ -256,7 +256,10 @@ Definition context_agree (C C': t_context) : bool :=
 (* Auxiliary definitions for expressing numerics semantics and typing *)
 Definition unop_type_agree (t: number_type) (op: unop): bool :=
   match op with
-  | Unop_i _ | Unop_extend _ => (t == T_i32) || (t == T_i64)
+  | Unop_i _ => (t == T_i32) || (t == T_i64)
+  | Unop_extend n =>
+      ((t == T_i32) && ((n == 8%N) || (n == 16%N))) ||
+      ((t == T_i64) && ((n == 8%N) || (n == 16%N) || (n == 32%N)))
   | Unop_f _ => (t == T_f32) || (t == T_f64)
   end.
 
@@ -1606,7 +1609,7 @@ Definition cvtop_valid (t2: number_type) (op: cvtop) (t1: number_type) (s: optio
   ((op == CVO_convert) && (is_float_t t2) && (is_int_t t1) && (s != None)) ||
   ((op == CVO_demote) && (t2 == T_f32) && (t1 == T_f64) && (s == None)) ||
   ((op == CVO_promote) && (t2 == T_f64) && (t1 == T_f32) && (s == None)) ||
-  ((op == CVO_reinterpret) && ((is_int_t t2 && is_float_t t1) || (is_float_t t2 && is_int_t t1)) && (s == None)).
+  ((op == CVO_reinterpret) && ((is_int_t t2 && is_float_t t1) || (is_float_t t2 && is_int_t t1)) && (tnum_length t2 == tnum_length t1) && (s == None)).
 
 End Operations.
 

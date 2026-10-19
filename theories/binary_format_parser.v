@@ -165,7 +165,11 @@ Definition parse_value_type {n} : byte_parser value_type n :=
 Definition parse_block_type {n} : byte_parser block_type n :=
   (exact_byte x40 $> BT_valtype None) <|>
   (fun t => BT_valtype (Some t)) <$> parse_value_type <|>
-  BT_id <$> parse_typeidx.
+  (* A block type index uses the nonnegative half of s33, not u32 or s32. *)
+  guardM
+    (fun x => if andb (Z.leb 0 x) (Z.leb x 4294967295%Z)
+              then Some (BT_id (Z.to_N x)) else None)
+    (assert_sized (extract parse_signed n) (fun sz => N.leb sz 5)).
 
 
 Definition parse_unreachable {n} : byte_parser basic_instruction n :=
