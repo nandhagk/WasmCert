@@ -44,6 +44,23 @@ Lemma encode_signed_plus63 :
   encode_signed 63%Z = (x3f :: nil).
 Proof. vm_compute. reflexivity. Qed.
 
+(** Positive 64 needs a zero sign group in both existing encoders. **)
+Lemma encode_signed_plus64 :
+  encode_signed 64%Z = (xc0 :: x00 :: nil).
+Proof. vm_compute. reflexivity. Qed.
+
+Lemma encode_unsigned_64 :
+  encode_unsigned 64%N = (xc0 :: x00 :: nil).
+Proof. vm_compute. reflexivity. Qed.
+
+Lemma parse_signed_plus64 :
+  check_toks (xc0 :: x00 :: nil) parse_signed = Singleton 64%Z.
+Proof. vm_compute. reflexivity. Qed.
+
+Lemma parse_signed_minus6 :
+  check_toks (x7a :: nil) parse_signed = Singleton (-6)%Z.
+Proof. vm_compute. reflexivity. Qed.
+
 (** Injectivity at boundary *)
 Lemma encode_signed_collision :
   encode_signed (-65)%Z <> encode_signed 63%Z.
