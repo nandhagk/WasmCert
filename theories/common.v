@@ -3,10 +3,15 @@
 
 From Stdlib Require Import Lia Wf_nat ZArith.
 From mathcomp Require Import ssreflect ssrnat ssrbool seq eqtype.
-(* Preserve the goal ordering expected by this development's proof scripts. *)
-Global Set SsrOldRewriteGoalsOrder.
 From compcert Require Integers.
 From HB Require Import structures.
+
+(* Rocq 9.2 changed the order in which ssreflect's [rewrite] emits the side
+   conditions of a conditional rewrite rule: they now come before the rewritten
+   goal instead of after it.  The proofs in this development are written against
+   the previous order, so restore it.  The flag is available in Rocq 9.0, 9.1 and
+   9.2, and is [on] by default before 9.2, so this is a no-op there. *)
+Global Set SsrOldRewriteGoalsOrder.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
